@@ -26,8 +26,6 @@ const keyFile = {
   universe_domain: "googleapis.com",
 };
 
-
-
 const serviceAccountAuth = new JWT({
   keyFile: "./keyFile.json",
   scopes: ["https://www.googleapis.com/auth/spreadsheets"],
