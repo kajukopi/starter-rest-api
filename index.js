@@ -20,10 +20,7 @@ const serviceAccountAuth = new JWT({
 
 const doc = new GoogleSpreadsheet(process.env.SHEET_ID, serviceAccountAuth);
 
-// console.log(process.env);
-
 app.get("/:id", async (req, res) => {
-  console.log("_");
   try {
     const { id } = req.params;
     await doc.loadInfo();
@@ -43,6 +40,7 @@ app.get("/:id", async (req, res) => {
     }
     res.json({ status: true, data: object, length: rows.length });
   } catch (error) {
+    console.log(error);
     res.json({ status: false, data: error });
   }
 });
