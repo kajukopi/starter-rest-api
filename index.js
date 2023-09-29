@@ -34,9 +34,10 @@ const serviceAccountAuth = new JWT({
 
 const doc = new GoogleSpreadsheet("133G_c39tK39M0HdI1QwfjNNx0yB7h3ipM82c-Dn-9g4", serviceAccountAuth);
 
-console.log(process.env);
+// console.log(process.env);
 
 app.get("/:id", async (req, res) => {
+  console.log("_");
   try {
     const { id } = req.params;
     await doc.loadInfo();
@@ -60,7 +61,7 @@ app.get("/:id", async (req, res) => {
   }
 });
 
-const port = process.env.PORT || 3000;
+const port = process.env.port || 3000;
 app.listen(port, () => {
   console.log("Listening on port 3000");
 });
