@@ -27,15 +27,10 @@ app.use(express.static("assets"));
 const cors = require("cors");
 
 // app.use(express.static);
+
 // app.use(express.json());
 
 app.use(cors());
-
-const qrcode = require("qrcode-terminal");
-
-const { Client } = require("whatsapp-web.js");
-
-const client = new Client();
 
 const { GoogleSpreadsheet } = require("google-spreadsheet");
 
@@ -77,22 +72,6 @@ const doc = new GoogleSpreadsheet(process.env.GOOGLE_SPREADSHEET_ID, serviceAcco
 // });
 
 // Routes
-
-client.on("qr", (qr) => {
-  qrcode.generate(qr, { small: true });
-});
-
-client.on("ready", () => {
-  console.log("Client is ready!");
-});
-
-client.on("message", (message) => {
-  if (message.body === "!ping") {
-    message.reply("pong");
-  }
-});
-
-client.initialize();
 
 app.get("/", async (req, res) => {
   await doc.loadInfo();
