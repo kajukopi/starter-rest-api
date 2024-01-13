@@ -3,8 +3,12 @@ require("fix-esm").register();
 require("dot-env");
 
 const express = require("express");
+const http = require("http");
+const socketIO = require("socket.io"); // Add this line
 
 const app = express();
+const server = http.createServer(app);
+const io = socketIO(server); // Add this line
 
 const { engine } = require("express-handlebars");
 
@@ -30,6 +34,19 @@ const cors = require("cors");
 // app.use(express.json());
 
 app.use(cors());
+
+io.on("connection", (socket) => {
+  console.log("A user connected");
+
+  // Handle custom events here
+  socket.on("chat message", (msg) => {
+    io.emit("chat message", msg);
+  });
+
+  socket.on("disconnect", () => {
+    console.log("User disconnected");
+  });
+});
 
 const qrcode = require("qrcode-terminal");
 
@@ -181,7 +198,7 @@ app.get("/delete/:id", async (req, res) => {
   }
 });
 
-const port = process.env.port || 3000;
-app.listen(port, () => {
-  console.log("Listening on port 3000");
+const port = process.env.PORT || 3000;
+server.listen(port, () => {
+  console.log(`Listening on port ${port}`);
 });
