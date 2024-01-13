@@ -1,6 +1,13 @@
 <h1>Edit Task</h1>
 <form action="/edit/{{tbody.id}}" method="post">
-  <input type="text" name="email" value="{{tbody.email}}" />
-  <input type="submit" value="Save" />
+  <div class="form-outline mb-3">
+    <input type="text" id="name" name="name" value="{{tbody.name}}" class="form-control order-form-input" />
+    <label class="form-label" for="name">Name</label>
+  </div>
+  <div class="form-outline mb-3">
+    <input type="email" id="email" name="email" value="{{tbody.email}}" class="form-control order-form-input" />
+    <label class="form-label" for="email">Email</label>
+  </div>
+  <button type="submit" class="btn btn-primary">Update</button>
 </form>
 <a href="/">Back to List</a>

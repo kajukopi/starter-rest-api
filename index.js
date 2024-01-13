@@ -31,11 +31,6 @@ const cors = require("cors");
 
 app.use(cors());
 
-const tasks = [
-  { id: 1, task: "Buy groceries" },
-  { id: 2, task: "Go to the gym" },
-];
-
 const { GoogleSpreadsheet } = require("google-spreadsheet");
 
 const { JWT } = require("google-auth-library");
@@ -77,28 +72,25 @@ const doc = new GoogleSpreadsheet(process.env.GOOGLE_SPREADSHEET_ID, serviceAcco
 
 app.get("/", async (req, res) => {
   await doc.loadInfo();
+  const sheet = doc.sheetsByTitle["assets"];
+  const rows = await sheet.getRows();
+  const tbody = [];
+  const thead = rows[0]._worksheet.headerValues;
+  rows.filter((item, index) => {
+    const obj = {};
+    for (let i = 0; i < thead.length; i++) {
+      obj["id"] = index + 1;
+      obj[thead[i]] = item._rawData[i];
+    }
+    tbody.push(obj);
+  });
   try {
-    // read rows
-    const sheet = doc.sheetsByTitle["assets"];
-    const rows = await sheet.getRows({ limit: 0, offset: 0 });
-    const tbody = [];
-    const thead = rows[0]._worksheet.headerValues;
-    rows.filter((item, index) => {
-      const obj = {};
-      for (let i = 0; i < thead.length; i++) {
-        obj["id"] = index + 1;
-        obj[thead[i]] = item._rawData[i];
-      }
-      tbody.push(obj);
-    });
     res.render("index", {
-      tasks,
       thead,
       tbody,
     });
   } catch (error) {
-    res.render("index", { tasks });
-    console.log(error.response.data.error);
+    res.render("index");
   }
 });
 
@@ -118,47 +110,52 @@ app.post("/add", async (req, res) => {
 });
 
 app.get("/edit/:id", async (req, res) => {
+  const id = parseInt(req.params.id) - 1;
   await doc.loadInfo();
   try {
-    const id = parseInt(req.params.id);
     const sheet = doc.sheetsByTitle["assets"];
-    const rows = await sheet.getRows({ limit: 1, offset: parseFloat(id) - 1 });
+    const rows = await sheet.getRows();
     const tbody = [];
     const thead = rows[0]._worksheet.headerValues;
     rows.filter((item, index) => {
       const obj = {};
       for (let i = 0; i < thead.length; i++) {
-        obj["id"] = index + 1;
+        obj["id"] = id;
         obj[thead[i]] = item._rawData[i];
       }
       tbody.push(obj);
     });
-    res.render("edit", { tbody:tbody[0] });
+    res.render("edit", { tbody: tbody[id] });
   } catch (error) {
     res.redirect("/");
-  };
+  }
 });
 
 app.post("/edit/:id", async (req, res) => {
   const id = parseInt(req.params.id);
+  await doc.loadInfo();
   try {
     const sheet = doc.sheetsByTitle["assets"];
-    const rows = await sheet.getRows({ limit: 1, offset: parseFloat(id)+1 });
-    rows[0].set('email') = 'sergey@abc.xyz'; // update a value
-    await rows[0].save();
+    const rows = await sheet.getRows();
+    rows[id].assign(req.body);
+    await rows[id].save();
     res.redirect("/");
   } catch (error) {
     res.redirect("/");
   }
 });
 
-app.get("/delete/:id", (req, res) => {
-  const id = parseInt(req.params.id);
-  const index = tasks.findIndex((task) => task.id === id);
-  if (index !== -1) {
-    tasks.splice(index, 1);
+app.get("/delete/:id", async (req, res) => {
+  const id = parseInt(req.params.id) - 1;
+  await doc.loadInfo();
+  try {
+    const sheet = doc.sheetsByTitle["assets"];
+    const rows = await sheet.getRows();
+    await rows[id].delete();
+    res.redirect("/");
+  } catch (error) {
+    res.redirect("/");
   }
-  res.redirect("/");
 });
 
 const port = process.env.port || 3000;
