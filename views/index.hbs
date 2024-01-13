@@ -1,0 +1,36 @@
+<h1>To-Do List</h1>
+<ul>
+  {{#each tasks}}
+    <li>
+      {{task}}
+      <a href="/edit/{{id}}">Edit</a>
+      <a href="/delete/{{id}}">Delete</a>
+    </li>
+  {{/each}}
+</ul>
+<table class="table table-sm align-middle mb-0 bg-white table-bordered border-primary">
+  <thead class="bg-light">
+    <tr>
+      {{#each thead}}
+        <th scope="col" style="text-transform: uppercase" class="fw-bold">{{this}}</th>
+      {{/each}}
+      <th scope="col" style="text-transform: uppercase" class="fw-bold">Action</th>
+    </tr>
+  </thead>
+  <tbody>
+    {{#each tbody}}
+      <tr>
+        <th scope="row">{{name}}</th>
+        <td>{{email}}</td>
+        <td style="width: 10%;">
+          <div class="d-flex flex-row align-items-center">
+            {{!-- <a href="" class="btn btn-primary btn-sm"><i class="fa-solid fa-plus"></i></a> --}}
+            <a href="/edit/{{id}}" class="btn btn-warning btn-sm mx-1"><i class="fa-solid fa-pen-to-square"></i></a>
+            <a href="/delete/{{id}}" class="btn btn-danger btn-sm"><i class="fa-solid fa-trash"></i></a>
+          </div>
+        </td>
+      </tr>
+    {{/each}}
+  </tbody>
+</table>
+<a href="/add">Add Task</a>
