@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "dev": "env-cmd nodemon index.js -e js,hbs,html",
+    "dev": "env-cmd nodemon index.js",
     "repl": "env-cmd node"
   },
   "keywords": [],
