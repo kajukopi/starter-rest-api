@@ -41,7 +41,7 @@ const serviceAccountAuth = new JWT({
   scopes: ["https://www.googleapis.com/auth/spreadsheets"],
 });
 
-console.log(process.env.GOOGLE_PRIVATE_KEY);
+console.log(process.env.GOOGLE_PRIVATE_KEY.replace(/\n/g, "\\n"));
 
 const doc = new GoogleSpreadsheet(process.env.GOOGLE_SPREADSHEET_ID, serviceAccountAuth);
 
