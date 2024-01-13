@@ -3,12 +3,8 @@ require("fix-esm").register();
 require("dot-env");
 
 const express = require("express");
-const http = require("http");
-const socketIO = require("socket.io"); // Add this line
 
 const app = express();
-const server = http.createServer(app);
-const io = socketIO(server); // Add this line
 
 const { engine } = require("express-handlebars");
 
@@ -35,18 +31,11 @@ const cors = require("cors");
 
 app.use(cors());
 
-io.on("connection", (socket) => {
-  console.log("A user connected");
+const qrcode = require("qrcode-terminal");
 
-  // Handle custom events here
-  socket.on("chat message", (msg) => {
-    io.emit("chat message", msg);
-  });
+const { Client } = require("whatsapp-web.js");
 
-  socket.on("disconnect", () => {
-    console.log("User disconnected");
-  });
-});
+const client = new Client();
 
 const { GoogleSpreadsheet } = require("google-spreadsheet");
 
@@ -88,6 +77,22 @@ const doc = new GoogleSpreadsheet(process.env.GOOGLE_SPREADSHEET_ID, serviceAcco
 // });
 
 // Routes
+
+client.on("qr", (qr) => {
+  qrcode.generate(qr, { small: true });
+});
+
+client.on("ready", () => {
+  console.log("Client is ready!");
+});
+
+client.on("message", (message) => {
+  if (message.body === "!ping") {
+    message.reply("pong");
+  }
+});
+
+client.initialize();
 
 app.get("/", async (req, res) => {
   await doc.loadInfo();
@@ -177,7 +182,7 @@ app.get("/delete/:id", async (req, res) => {
   }
 });
 
-const port = process.env.PORT || 3000;
-server.listen(port, () => {
-  console.log(`Listening on port ${port}`);
+const port = process.env.port || 3000;
+app.listen(port, () => {
+  console.log("Listening on port 3000");
 });
