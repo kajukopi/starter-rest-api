@@ -91,8 +91,6 @@ app.get("/", async (req, res) => {
       }
       tbody.push(obj);
     });
-    console.log(tbody);
-    console.log(thead);
     res.render("index", {
       tasks,
       thead,
@@ -120,30 +118,36 @@ app.post("/add", async (req, res) => {
 });
 
 app.get("/edit/:id", async (req, res) => {
-  const id = parseInt(req.params.id);
-  const task = tasks.find((task) => task.id === id);
-
   await doc.loadInfo();
-  const sheet = doc.sheetsByTitle["assets"];
-
-  const rows = await sheet.getRows({ limit: 1, offset: parseFloat(id) - 1 });
-
-  console.log(rows);
-
-  if (!task) {
+  try {
+    const id = parseInt(req.params.id);
+    const sheet = doc.sheetsByTitle["assets"];
+    const rows = await sheet.getRows({ limit: 1, offset: parseFloat(id) - 1 });
+    const tbody = [];
+    const thead = rows[0]._worksheet.headerValues;
+    rows.filter((item, index) => {
+      const obj = {};
+      for (let i = 0; i < thead.length; i++) {
+        obj["id"] = index + 1;
+        obj[thead[i]] = item._rawData[i];
+      }
+      tbody.push(obj);
+    });
+    res.render("edit", { tbody:tbody[0] });
+  } catch (error) {
     res.redirect("/");
-  } else {
-    res.render("edit", { task });
-  }
+  };
 });
 
-app.post("/edit/:id", (req, res) => {
+app.post("/edit/:id", async (req, res) => {
   const id = parseInt(req.params.id);
-  const task = tasks.find((task) => task.id === id);
-  if (!task) {
+  try {
+    const sheet = doc.sheetsByTitle["assets"];
+    const rows = await sheet.getRows({ limit: 1, offset: parseFloat(id)+1 });
+    rows[0].set('email') = 'sergey@abc.xyz'; // update a value
+    await rows[0].save();
     res.redirect("/");
-  } else {
-    task.task = req.body.task;
+  } catch (error) {
     res.redirect("/");
   }
 });
