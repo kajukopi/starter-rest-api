@@ -41,7 +41,7 @@ const serviceAccountAuth = new JWT({
   scopes: ["https://www.googleapis.com/auth/spreadsheets"],
 });
 
-console.log(process.env.GOOGLE_PRIVATE_KEY.replace(/\\n/g, "\n"));
+// console.log(process.env.GOOGLE_PRIVATE_KEY.replace(/\\n/g, "\n"));
 
 const doc = new GoogleSpreadsheet(process.env.GOOGLE_SPREADSHEET_ID, serviceAccountAuth);
 
@@ -81,7 +81,7 @@ app.get("/", async (req, res) => {
   rows.filter((item, index) => {
     const obj = {};
     for (let i = 0; i < thead.length; i++) {
-      obj["id"] = index + 1;
+      obj["id"] = index;
       obj[thead[i]] = item._rawData[i];
     }
     tbody.push(obj);
@@ -112,7 +112,7 @@ app.post("/add", async (req, res) => {
 });
 
 app.get("/edit/:id", async (req, res) => {
-  const id = parseInt(req.params.id) - 1;
+  const id = parseInt(req.params.id);
   await doc.loadInfo();
   try {
     const sheet = doc.sheetsByTitle["assets"];
@@ -148,7 +148,7 @@ app.post("/edit/:id", async (req, res) => {
 });
 
 app.get("/delete/:id", async (req, res) => {
-  const id = parseInt(req.params.id) - 1;
+  const id = parseInt(req.params.id);
   await doc.loadInfo();
   try {
     const sheet = doc.sheetsByTitle["assets"];
