@@ -8,8 +8,6 @@ const app = express();
 
 const { engine } = require("express-handlebars");
 
-app.use(express.urlencoded({ extended: true }));
-
 app.engine(".hbs", engine({ extname: ".hbs" }));
 
 app.set("view engine", ".hbs");
@@ -25,10 +23,6 @@ app.use(express.urlencoded({ extended: false }));
 app.use(express.static("assets"));
 
 const cors = require("cors");
-
-// app.use(express.static);
-
-// app.use(express.json());
 
 app.use(cors());
 
